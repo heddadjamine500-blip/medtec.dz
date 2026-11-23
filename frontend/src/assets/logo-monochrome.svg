@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <!-- Monochrome Geometric M with subtle medical cross -->
+  <rect x="12" y="12" width="216" height="216" rx="44" fill="#0F172A" />
+  <path d="M52 176V68L120 128L188 68V176" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M120 94V162M86 128H154" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" />
+</svg>
