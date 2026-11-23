@@ -57,7 +57,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ token: res.token, user: res.user, isLoading: false });
       return res.user;
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Identifiants incorrects';
+      const msg = err.response?.data?.message 
+        || (err.code === 'ERR_NETWORK' || !err.response 
+          ? 'Serveur inaccessible : assurez-vous que le backend tourne sur le port 10000.' 
+          : 'Identifiants incorrects');
       set({ error: msg, isLoading: false });
       throw new Error(msg);
     }
