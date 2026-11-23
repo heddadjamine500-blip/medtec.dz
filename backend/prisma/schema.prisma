@@ -39,6 +39,7 @@ model PatientProfile {
   appointments  Appointment[]
   orders        Order[]
   consultations Consultation[]
+  imagings      MedicalImaging[]
 }
 
 model DoctorProfile {
@@ -79,7 +80,7 @@ model Consultation {
   vitalSigns String?
   createdAt  DateTime       @default(now())
   hospitalId String?        // nullable tenant reference
-  hospital Hospital? @relation("HospitalInventoryItems", fields: [hospitalId], references: [id])
+  hospital Hospital? @relation("HospitalConsultations", fields: [hospitalId], references: [id])
 }
 
 model Prescription {
@@ -167,7 +168,7 @@ model Appointment {
   status    String   @default("PENDING") // PENDING / CONFIRMED / CANCELLED / COMPLETED
   createdAt DateTime @default(now())
   hospitalId String?       // nullable tenant reference
-
+  hospital   Hospital?     @relation("HospitalAppointments", fields: [hospitalId], references: [id])
 }
 
 model Order {
@@ -184,7 +185,7 @@ model Order {
 
   items OrderItem[]
   hospitalId String?       // nullable tenant reference
-
+  hospital   Hospital?     @relation("HospitalOrders", fields: [hospitalId], references: [id])
 }
 
 model OrderItem {
@@ -197,7 +198,7 @@ model OrderItem {
 
   quantity Int
   hospitalId String?       // nullable tenant reference
-
+  hospital   Hospital?     @relation("HospitalOrderItems", fields: [hospitalId], references: [id])
 }
 
 model Notification {
@@ -211,7 +212,7 @@ model Notification {
   link      String?
   createdAt DateTime @default(now())
   hospitalId String?        // nullable tenant reference
-  hospital Hospital? @relation("HospitalInventoryItems", fields: [hospitalId], references: [id])
+  hospital Hospital? @relation("HospitalNotifications", fields: [hospitalId], references: [id])
 }
 
 model AuditLog {
@@ -224,7 +225,7 @@ model AuditLog {
   ipAddress String?
   createdAt DateTime @default(now())
   hospitalId String?        // nullable tenant reference
-  hospital Hospital? @relation("HospitalInventoryItems", fields: [hospitalId], references: [id])
+  hospital Hospital? @relation("HospitalAuditLogs", fields: [hospitalId], references: [id])
 }
 
 // ==================== Multi‑hospital extensions ====================
@@ -258,13 +259,15 @@ model Hospital {
   inventoryItems      InventoryItem[] @relation("HospitalInventoryItems")
   stockMovements      StockMovement[] @relation("HospitalStockMovements")
   doctorAvailabilities DoctorAvailability[] @relation("HospitalDoctorAvailabilities")
-  appointments        Appointment[]
-  orders              Order[]
-  orderItems          OrderItem[]
-  notifications       Notification[]
-  auditLogs           AuditLog[]
+  appointments        Appointment[]         @relation("HospitalAppointments")
+  orders              Order[]               @relation("HospitalOrders")
+  orderItems          OrderItem[]           @relation("HospitalOrderItems")
+  notifications       Notification[]        @relation("HospitalNotifications")
+  auditLogs           AuditLog[]            @relation("HospitalAuditLogs")
 
-  rooms           Room[] @relation("HospitalRooms")
+  rooms               Room[]                @relation("HospitalRooms")
+  memberships         HospitalMembership[]
+  imagings            MedicalImaging[]      @relation("HospitalMedicalImagings")
 }
 
 model Room {
@@ -275,6 +278,7 @@ model Room {
   hospital    Hospital? @relation("HospitalRooms", fields: [hospitalId], references: [id])
 }
 
+model HospitalMembership {
   id         String       @id @default(uuid())
   user       User         @relation(fields: [userId], references: [id])
   userId     String
@@ -286,4 +290,23 @@ model Room {
   updatedAt  DateTime     @updatedAt
 
   @@unique([userId, hospitalId])
+}
+
+model MedicalImaging {
+  id          String         @id @default(uuid())
+  patientId   String
+  patient     PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  title       String
+  type        String         // XRAY, CT_SCAN, MRI, ULTRASOUND, OTHER
+  date        DateTime       @default(now())
+  bodyPart    String?
+  facility    String?
+  notes       String?
+  fileUrl     String         // Data URL or file URL
+  fileName    String?
+  fileType    String?        // image/jpeg, image/png, application/pdf
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  hospitalId  String?        // nullable tenant reference
+  hospital    Hospital?      @relation("HospitalMedicalImagings", fields: [hospitalId], references: [id])
 }

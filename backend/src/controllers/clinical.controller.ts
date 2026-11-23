@@ -263,3 +263,108 @@ export const createConsultation = async (req: AuthRequest, res: Response): Promi
     res.status(500).json({ message: 'Erreur lors de la création de la consultation' });
   }
 };
+
+// Medical Imaging (Radiographies, Scanners, IRM, Échographies)
+export const getImagings = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const user = req.user;
+    const { patientId } = req.query;
+    const where: any = {};
+
+    if (user?.role === 'PATIENT') {
+      const patient = await prisma.patientProfile.findUnique({ where: { userId: user.id } });
+      if (!patient) {
+        res.json([]);
+        return;
+      }
+      where.patientId = patient.id;
+    } else if (patientId) {
+      where.patientId = String(patientId);
+    }
+
+    const imagings = await prisma.medicalImaging.findMany({
+      where,
+      include: {
+        patient: true,
+      },
+      orderBy: { date: 'desc' },
+    });
+
+    res.json(imagings);
+  } catch (error) {
+    console.error('Erreur getImagings:', error);
+    res.status(500).json({ message: "Erreur lors de la récupération des examens d'imagerie" });
+  }
+};
+
+export const createImaging = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const user = req.user;
+    const { title, type, date, bodyPart, facility, notes, fileUrl, fileName, fileType, patientId: targetPatientId } = req.body;
+
+    let patientId = targetPatientId;
+    if (user?.role === 'PATIENT') {
+      const patient = await prisma.patientProfile.findUnique({ where: { userId: user.id } });
+      if (!patient) {
+        res.status(404).json({ message: 'Profil patient introuvable' });
+        return;
+      }
+      patientId = patient.id;
+    }
+
+    if (!patientId || !title || !fileUrl) {
+      res.status(400).json({ message: "Titre, document/image et patient requis" });
+      return;
+    }
+
+    const imaging = await prisma.medicalImaging.create({
+      data: {
+        patientId,
+        title,
+        type: type || 'XRAY',
+        date: date ? new Date(date) : new Date(),
+        bodyPart: bodyPart || null,
+        facility: facility || null,
+        notes: notes || null,
+        fileUrl,
+        fileName: fileName || null,
+        fileType: fileType || null,
+      },
+      include: {
+        patient: true,
+      },
+    });
+
+    res.status(201).json(imaging);
+  } catch (error) {
+    console.error('Erreur createImaging:', error);
+    res.status(500).json({ message: "Erreur lors de l'enregistrement de l'examen d'imagerie" });
+  }
+};
+
+export const deleteImaging = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const user = req.user;
+    const id = String(req.params.id);
+
+    const existing = await prisma.medicalImaging.findUnique({ where: { id } });
+    if (!existing) {
+      res.status(404).json({ message: 'Examen introuvable' });
+      return;
+    }
+
+    if (user?.role === 'PATIENT') {
+      const patient = await prisma.patientProfile.findUnique({ where: { userId: user.id } });
+      if (!patient || existing.patientId !== patient.id) {
+        res.status(403).json({ message: 'Action non autorisée' });
+        return;
+      }
+    }
+
+    await prisma.medicalImaging.delete({ where: { id } });
+    res.json({ message: 'Examen supprimé avec succès' });
+  } catch (error) {
+    console.error('Erreur deleteImaging:', error);
+    res.status(500).json({ message: "Erreur lors de la suppression de l'examen" });
+  }
+};

@@ -13,7 +13,8 @@ const app = express();
 app.use(cors());
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(morgan('dev'));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Root Landing & API Status Dashboard
 app.get('/', (req: Request, res: Response) => {

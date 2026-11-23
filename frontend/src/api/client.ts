@@ -57,6 +57,22 @@ export const apiService = {
   getConsultations: async (params?: any) => (await api.get('/clinical/consultations', { params })).data,
   createConsultation: async (data: any) => (await api.post('/clinical/consultations', data)).data,
 
+  // Medical Imaging (Radiographies, Scanners, IRM)
+  getImagings: async (params?: any) => (await api.get('/clinical/imaging', { params })).data,
+  createImaging: async (data: {
+    title: string;
+    type: string;
+    date?: string;
+    bodyPart?: string;
+    facility?: string;
+    notes?: string;
+    fileUrl: string;
+    fileName?: string;
+    fileType?: string;
+    patientId?: string;
+  }) => (await api.post('/clinical/imaging', data)).data,
+  deleteImaging: async (id: string) => (await api.delete(`/clinical/imaging/${id}`)).data,
+
   // Admin User Management
   getUsers: async () => (await api.get('/clinical/users')).data,
   updateUser: async (id: string, data: any) => (await api.put(`/clinical/users/${id}`, data)).data,

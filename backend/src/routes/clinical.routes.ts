@@ -7,7 +7,10 @@ import {
   updateUser, 
   deleteUser,
   getConsultations,
-  createConsultation
+  createConsultation,
+  getImagings,
+  createImaging,
+  deleteImaging
 } from '../controllers/clinical.controller';
 import { authenticateJWT, requireRoles } from '../middlewares/auth.middleware';
 
@@ -23,6 +26,11 @@ router.get('/stats', requireRoles(['DOCTOR', 'ADMIN']), getStats);
 // Consultations
 router.get('/consultations', requireRoles(['PATIENT', 'DOCTOR', 'ADMIN']), getConsultations);
 router.post('/consultations', requireRoles(['DOCTOR', 'ADMIN']), createConsultation);
+
+// Medical Imaging (Radiographies, Scanners, IRM)
+router.get('/imaging', requireRoles(['PATIENT', 'DOCTOR', 'ADMIN']), getImagings);
+router.post('/imaging', requireRoles(['PATIENT', 'DOCTOR', 'ADMIN']), createImaging);
+router.delete('/imaging/:id', requireRoles(['PATIENT', 'DOCTOR', 'ADMIN']), deleteImaging);
 
 // Admin Users CRUD
 router.get('/users', requireRoles(['ADMIN']), getAllUsers);
