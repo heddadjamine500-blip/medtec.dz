@@ -13,7 +13,8 @@ import {
   Stethoscope, 
   Pill, 
   Shield,
-  HelpCircle
+  HelpCircle,
+  UserCheck
 } from 'lucide-react';
 
 export interface LoginFormProps {
@@ -51,6 +52,13 @@ export const DEMO_PRESETS = [
     email: 'admin@medtec.com',
     color: '#6B7280',
     icon: <Shield className="w-3.5 h-3.5" />,
+  },
+  {
+    role: 'EMPLOYEE',
+    label: 'Employé',
+    email: 'infirmiere.amira@medtec.com',
+    color: '#8B5CF6',
+    icon: <UserCheck className="w-3.5 h-3.5" />,
   },
 ];
 
@@ -107,7 +115,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             Mot de passe : <span className="text-[#2585D8] font-mono font-bold">password123</span>
           </span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
           {DEMO_PRESETS.map((p) => (
             <button
               key={p.role}
