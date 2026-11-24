@@ -4,7 +4,7 @@ import { apiService } from '../api/client';
 export interface UserProfile {
   id: string;
   email: string;
-  role: 'PATIENT' | 'DOCTOR' | 'PHARMACY' | 'ADMIN';
+  role: 'PATIENT' | 'DOCTOR' | 'PHARMACY' | 'ADMIN' | 'EMPLOYEE';
   isActive?: boolean;
   patientInfo?: {
     id: string;
@@ -27,6 +27,16 @@ export interface UserProfile {
     name: string;
     address: string;
     phone?: string | null;
+  };
+  employeeInfo?: {
+    id: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    jobTitle: string;
+    department?: string | null;
+    phone?: string | null;
+    status?: string;
   };
 }
 

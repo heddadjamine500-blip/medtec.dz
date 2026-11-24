@@ -26,8 +26,10 @@ api.interceptors.response.use(
       const isAuthUrl = error.config?.url?.includes('/auth/login') || error.config?.url?.includes('/auth/register');
       if (!isAuthUrl) {
         localStorage.removeItem('medtec_token');
-        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-          window.location.href = '/login';
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+          const rawBase = (import.meta.env.BASE_URL || '/').replace(/^\.\/?/, '/');
+          const loginUrl = `${rawBase.endsWith('/') ? rawBase : rawBase + '/'}login`;
+          window.location.href = loginUrl;
         }
       }
     }
@@ -117,4 +119,43 @@ export const apiService = {
   createOrder: async (data: any) => (await api.post('/pharmacy/orders', data)).data,
   updateOrderStatus: async (id: string, status: string) => 
     (await api.patch(`/pharmacy/orders/${id}/status`, { status })).data,
+
+  // Admin Rooms
+  getRooms: async (params?: any) => (await api.get('/admin/rooms', { params })).data,
+  getRoomById: async (id: string) => (await api.get(`/admin/rooms/${id}`)).data,
+  createRoom: async (data: any) => (await api.post('/admin/rooms', data)).data,
+  updateRoom: async (id: string, data: any) => (await api.put(`/admin/rooms/${id}`, data)).data,
+  deleteRoom: async (id: string) => (await api.delete(`/admin/rooms/${id}`)).data,
+  getRoomBookings: async (params?: any) => (await api.get('/admin/rooms/bookings', { params })).data,
+  createRoomBooking: async (data: any) => (await api.post('/admin/rooms/bookings', data)).data,
+  cancelRoomBooking: async (id: string) => (await api.put(`/admin/rooms/bookings/${id}/cancel`)).data,
+
+  // Admin Employees
+  getEmployees: async (params?: any) => (await api.get('/admin/employees', { params })).data,
+  getEmployeeById: async (id: string) => (await api.get(`/admin/employees/${id}`)).data,
+  createEmployee: async (data: any) => (await api.post('/admin/employees', data)).data,
+  updateEmployee: async (id: string, data: any) => (await api.put(`/admin/employees/${id}`, data)).data,
+
+  // Admin Doctors
+  getAdminDoctors: async (params?: any) => (await api.get('/admin/doctors', { params })).data,
+  createAdminDoctor: async (data: any) => (await api.post('/admin/doctors', data)).data,
+  updateAdminDoctor: async (id: string, data: any) => (await api.put(`/admin/doctors/${id}`, data)).data,
+
+  // Admin Patients (Administrative Only)
+  getAdminPatients: async (params?: any) => (await api.get('/admin/patients', { params })).data,
+  getAdminPatientById: async (id: string) => (await api.get(`/admin/patients/${id}`)).data,
+  updateAdminPatient: async (id: string, data: any) => (await api.put(`/admin/patients/${id}`, data)).data,
+
+  // Attendance (Staff & Admin)
+  clockIn: async () => (await api.post('/attendance/clock-in')).data,
+  clockOut: async () => (await api.post('/attendance/clock-out')).data,
+  getMyAttendanceStatus: async () => (await api.get('/attendance/status')).data,
+  getMyAttendances: async (params?: any) => (await api.get('/attendance/me', { params })).data,
+  getAdminAttendances: async (params?: any) => (await api.get('/admin/attendance', { params })).data,
+  getAttendanceSummary: async (params?: any) => (await api.get('/admin/attendance/summary', { params })).data,
+  correctAttendance: async (data: any) => (await api.post('/admin/attendance/correction', data)).data,
+  markAbsence: async (data: any) => (await api.post('/admin/attendance/mark-absence', data)).data,
+  getWorkSchedules: async (userId: string) => (await api.get(`/admin/attendance/schedules/${userId}`)).data,
+  updateWorkSchedules: async (userId: string, schedules: any[]) => 
+    (await api.put(`/admin/attendance/schedules/${userId}`, { schedules })).data,
 };

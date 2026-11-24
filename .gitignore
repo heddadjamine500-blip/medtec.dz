@@ -18,6 +18,7 @@ out/
 
 # SQLite backups and temporary database files
 *.db-journal
+*.backup*
 backend/prisma/*.backup.*.db
 
 # Logs

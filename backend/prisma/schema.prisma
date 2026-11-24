@@ -21,9 +21,14 @@ model User {
   patientInfo       PatientProfile?
   doctorInfo        DoctorProfile?
   pharmacyInfo      PharmacyProfile?
+  employeeInfo      EmployeeProfile?
   notifications     Notification[]
   auditLogs         AuditLog[]
   hospitalMemberships HospitalMembership[]
+  roomBookings      RoomBooking[]        @relation("BookedBy")
+  attendances       Attendance[]         @relation("UserAttendance")
+  correctedAttendances Attendance[]       @relation("AttendanceCorrector")
+  workSchedules     WorkSchedule[]
 }
 
 model PatientProfile {
@@ -55,6 +60,7 @@ model DoctorProfile {
   appointments   Appointment[]
   consultations  Consultation[]
   availabilities DoctorAvailability[]
+  roomBookings   RoomBooking[]
 }
 
 model PharmacyProfile {
@@ -271,11 +277,80 @@ model Hospital {
 }
 
 model Room {
-  id          String   @id @default(uuid())
-  name        String
+  id          String        @id @default(uuid())
+  name        String        @unique
+  type        String        @default("CONSULTATION") // CONSULTATION | OPERATING | WARD | EMERGENCY | ICU | LAB | OTHER
+  floor       Int?
   capacity    Int?
-  hospitalId  String?        // nullable tenant reference
-  hospital    Hospital? @relation("HospitalRooms", fields: [hospitalId], references: [id])
+  status      String        @default("AVAILABLE") // AVAILABLE | MAINTENANCE | CLOSED
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+  hospitalId  String?       // nullable tenant reference
+  hospital    Hospital?     @relation("HospitalRooms", fields: [hospitalId], references: [id])
+  bookings    RoomBooking[]
+}
+
+model RoomBooking {
+  id             String        @id @default(uuid())
+  roomId         String
+  room           Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  startAt        DateTime
+  endAt          DateTime
+  purpose        String
+  bookedByUserId String
+  bookedByUser   User          @relation("BookedBy", fields: [bookedByUserId], references: [id], onDelete: Cascade)
+  doctorId       String?
+  doctor         DoctorProfile? @relation(fields: [doctorId], references: [id], onDelete: SetNull)
+  status         String        @default("SCHEDULED") // SCHEDULED | CANCELLED | COMPLETED
+  createdAt      DateTime      @default(now())
+}
+
+model EmployeeProfile {
+  id           String        @id @default(uuid())
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeCode String        @unique
+  firstName    String
+  lastName     String
+  jobTitle     String        // NURSE | ANESTHESIOLOGIST | RECEPTIONIST | TECHNICIAN | PHARMACIST_ASSISTANT | SECURITY | CLEANING | ADMIN_STAFF | OTHER
+  department   String?
+  phone        String?
+  hireDate     DateTime?
+  status       String        @default("ACTIVE") // ACTIVE | ON_LEAVE | SUSPENDED | TERMINATED
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+}
+
+model Attendance {
+  id                String        @id @default(uuid())
+  userId            String
+  user              User          @relation("UserAttendance", fields: [userId], references: [id], onDelete: Cascade)
+  date              String        // jour, format YYYY-MM-DD
+  checkInAt         DateTime
+  checkOutAt        DateTime?
+  source            String        @default("SELF") // SELF | ADMIN
+  status            String        @default("PRESENT") // PRESENT | LATE | ABSENT | LEAVE
+  note              String?
+  correctedByUserId String?
+  correctedByUser   User?         @relation("AttendanceCorrector", fields: [correctedByUserId], references: [id], onDelete: SetNull)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @default(now()) @updatedAt
+}
+
+model WorkSchedule {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekday   Int      // 0 = Dimanche, 1 = Lundi ... 6 = Samedi
+  startTime String   // "HH:mm"
+  endTime   String   // "HH:mm"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([userId, weekday])
 }
 
 model HospitalMembership {

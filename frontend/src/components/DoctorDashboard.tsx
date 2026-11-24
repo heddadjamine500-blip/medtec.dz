@@ -21,6 +21,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { apiService } from '../api/client';
 import { useAuthStore } from '../store/authStore';
+import ClockInCard from './ClockInCard';
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
@@ -437,6 +438,11 @@ export default function DoctorDashboard() {
                     <FileText className="w-5 h-5" />
                   </div>
                 </div>
+              </div>
+
+              {/* Attendance Clock-In Widget for Doctor */}
+              <div className="mb-6">
+                <ClockInCard />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

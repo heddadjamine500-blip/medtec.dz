@@ -20,17 +20,17 @@ router.use(authenticateJWT);
 
 // Clinical data
 router.get('/doctors', requireRoles(['PATIENT', 'DOCTOR', 'PHARMACY', 'ADMIN']), getDoctors);
-router.get('/patients', requireRoles(['DOCTOR', 'ADMIN']), getPatients);
+router.get('/patients', requireRoles(['DOCTOR']), getPatients);
 router.get('/stats', requireRoles(['DOCTOR', 'ADMIN']), getStats);
 
-// Consultations
-router.get('/consultations', requireRoles(['PATIENT', 'DOCTOR', 'ADMIN']), getConsultations);
-router.post('/consultations', requireRoles(['DOCTOR', 'ADMIN']), createConsultation);
+// Consultations (Clinique uniquement - ADMIN exclu)
+router.get('/consultations', requireRoles(['PATIENT', 'DOCTOR']), getConsultations);
+router.post('/consultations', requireRoles(['DOCTOR']), createConsultation);
 
-// Medical Imaging (Radiographies, Scanners, IRM)
-router.get('/imaging', requireRoles(['PATIENT', 'DOCTOR', 'ADMIN']), getImagings);
-router.post('/imaging', requireRoles(['PATIENT', 'DOCTOR', 'ADMIN']), createImaging);
-router.delete('/imaging/:id', requireRoles(['PATIENT', 'DOCTOR', 'ADMIN']), deleteImaging);
+// Medical Imaging (Radiographies, Scanners, IRM - Clinique uniquement - ADMIN exclu)
+router.get('/imaging', requireRoles(['PATIENT', 'DOCTOR']), getImagings);
+router.post('/imaging', requireRoles(['PATIENT', 'DOCTOR']), createImaging);
+router.delete('/imaging/:id', requireRoles(['PATIENT', 'DOCTOR']), deleteImaging);
 
 // Admin Users CRUD
 router.get('/users', requireRoles(['ADMIN']), getAllUsers);

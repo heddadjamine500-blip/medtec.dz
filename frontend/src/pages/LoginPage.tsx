@@ -15,6 +15,7 @@ export default function LoginPage() {
       else if (user.role === 'DOCTOR') navigate('/doctor', { replace: true });
       else if (user.role === 'PHARMACY') navigate('/pharmacy', { replace: true });
       else if (user.role === 'ADMIN') navigate('/admin', { replace: true });
+      else if (user.role === 'EMPLOYEE') navigate('/employee', { replace: true });
     }
   }, [token, user, navigate]);
 
@@ -26,6 +27,7 @@ export default function LoginPage() {
       else if (loggedUser.role === 'DOCTOR') navigate('/doctor', { replace: true });
       else if (loggedUser.role === 'PHARMACY') navigate('/pharmacy', { replace: true });
       else if (loggedUser.role === 'ADMIN') navigate('/admin', { replace: true });
+      else if (loggedUser.role === 'EMPLOYEE') navigate('/employee', { replace: true });
       else navigate('/', { replace: true });
     } catch {
       // Handled in store and displayed in form

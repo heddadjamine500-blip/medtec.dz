@@ -17,6 +17,7 @@ import DoctorDashboard from './components/DoctorDashboard';
 import PatientDashboard from './components/PatientDashboard';
 import PharmacyDashboard from './components/PharmacyDashboard';
 import AdminDashboard from './components/AdminDashboard';
+import EmployeeDashboard from './components/EmployeeDashboard';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -34,6 +35,7 @@ function WelcomePage() {
     if (user.role === 'DOCTOR') return '/doctor';
     if (user.role === 'PHARMACY') return '/pharmacy';
     if (user.role === 'ADMIN') return '/admin';
+    if (user.role === 'EMPLOYEE') return '/employee';
     return '/';
   };
 
@@ -231,12 +233,15 @@ function App() {
     }
   }, [token, loadUser]);
 
+  const rawBase = import.meta.env.BASE_URL || '/';
+  const basename = rawBase.replace(/^\.\/?/, '/') || '/';
+
   return (
     <>
       {/* Intro Animation at the very beginning of the app (only Skip button inside) */}
       <LogoIntroOverlay isOpen={showIntro} onClose={handleCloseIntro} />
 
-      <Router>
+      <Router basename={basename}>
         <Routes>
           <Route path="/" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -270,6 +275,14 @@ function App() {
             element={
               <ProtectedRoute requiredRole="ADMIN">
                 <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/employee" 
+            element={
+              <ProtectedRoute requiredRole="EMPLOYEE">
+                <EmployeeDashboard />
               </ProtectedRoute>
             } 
           />

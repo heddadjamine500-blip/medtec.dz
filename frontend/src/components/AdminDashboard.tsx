@@ -14,17 +14,29 @@ import {
   CheckCircle2, 
   AlertCircle,
   LogOut,
-  Loader2
+  Loader2,
+  DoorClosed,
+  Stethoscope,
+  Clock,
+  Briefcase
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { apiService } from '../api/client';
 import { useAuthStore } from '../store/authStore';
 
+import RoomManagement from './admin/RoomManagement';
+import EmployeeManagement from './admin/EmployeeManagement';
+import DoctorManagement from './admin/DoctorManagement';
+import PatientAdminManagement from './admin/PatientAdminManagement';
+import AttendanceManagement from './admin/AttendanceManagement';
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
 
-  const [activeTab, setActiveTab] = useState<'monitoring' | 'users' | 'system'>('monitoring');
+  const [activeTab, setActiveTab] = useState<
+    'monitoring' | 'rooms' | 'employees' | 'doctors' | 'patients' | 'attendance' | 'users' | 'system'
+  >('monitoring');
   const [stats, setStats] = useState<any>(null);
   const [usersList, setUsersList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,6 +169,66 @@ export default function AdminDashboard() {
             </button>
 
             <button
+              onClick={() => setActiveTab('rooms')}
+              className={`w-full flex items-center px-4 py-2.5 rounded-2xl transition-all cursor-pointer ${
+                activeTab === 'rooms' 
+                  ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-600/30' 
+                  : 'hover:bg-white/10 text-gray-300 font-medium'
+              }`}
+            >
+              <DoorClosed className="w-4 h-4 mr-3" />
+              <span className="text-xs">Salles & Blocs</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('employees')}
+              className={`w-full flex items-center px-4 py-2.5 rounded-2xl transition-all cursor-pointer ${
+                activeTab === 'employees' 
+                  ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-600/30' 
+                  : 'hover:bg-white/10 text-gray-300 font-medium'
+              }`}
+            >
+              <Briefcase className="w-4 h-4 mr-3" />
+              <span className="text-xs">Employés & Personnel</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('doctors')}
+              className={`w-full flex items-center px-4 py-2.5 rounded-2xl transition-all cursor-pointer ${
+                activeTab === 'doctors' 
+                  ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-600/30' 
+                  : 'hover:bg-white/10 text-gray-300 font-medium'
+              }`}
+            >
+              <Stethoscope className="w-4 h-4 mr-3" />
+              <span className="text-xs">Corps Médical</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('patients')}
+              className={`w-full flex items-center px-4 py-2.5 rounded-2xl transition-all cursor-pointer ${
+                activeTab === 'patients' 
+                  ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-600/30' 
+                  : 'hover:bg-white/10 text-gray-300 font-medium'
+              }`}
+            >
+              <Users className="w-4 h-4 mr-3" />
+              <span className="text-xs">Patients (Administratif)</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('attendance')}
+              className={`w-full flex items-center px-4 py-2.5 rounded-2xl transition-all cursor-pointer ${
+                activeTab === 'attendance' 
+                  ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-600/30' 
+                  : 'hover:bg-white/10 text-gray-300 font-medium'
+              }`}
+            >
+              <Clock className="w-4 h-4 mr-3" />
+              <span className="text-xs">Pointage & Horaires</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('users')}
               className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl transition-all cursor-pointer ${
                 activeTab === 'users' 
@@ -165,8 +237,8 @@ export default function AdminDashboard() {
               }`}
             >
               <div className="flex items-center">
-                <Users className="w-4 h-4 mr-3" />
-                <span className="text-xs">Utilisateurs & Rôles</span>
+                <Shield className="w-4 h-4 mr-3" />
+                <span className="text-xs">Tous les Comptes</span>
               </div>
               <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-white/20 text-white">
                 {usersList.length}
@@ -281,6 +353,31 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB: ROOMS */}
+          {!loading && activeTab === 'rooms' && (
+            <RoomManagement />
+          )}
+
+          {/* TAB: EMPLOYEES */}
+          {!loading && activeTab === 'employees' && (
+            <EmployeeManagement />
+          )}
+
+          {/* TAB: DOCTORS */}
+          {!loading && activeTab === 'doctors' && (
+            <DoctorManagement />
+          )}
+
+          {/* TAB: PATIENTS */}
+          {!loading && activeTab === 'patients' && (
+            <PatientAdminManagement />
+          )}
+
+          {/* TAB: ATTENDANCE */}
+          {!loading && activeTab === 'attendance' && (
+            <AttendanceManagement />
           )}
 
           {/* TAB 2: USERS CRUD */}

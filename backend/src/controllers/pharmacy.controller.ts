@@ -4,7 +4,24 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 
 export const getInventory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const user = req.user;
+    const where: any = {};
+
+    if (user?.role === 'PHARMACY') {
+      const pharmacy = await prisma.pharmacyProfile.findUnique({
+        where: { userId: user.id },
+      });
+      if (!pharmacy) {
+        res.json([]);
+        return;
+      }
+      where.pharmacyId = pharmacy.id;
+    } else if (req.query.pharmacyId) {
+      where.pharmacyId = String(req.query.pharmacyId);
+    }
+
     const items = await prisma.inventoryItem.findMany({
+      where,
       include: {
         pharmacy: true,
       },
@@ -114,6 +131,14 @@ export const updateInventoryItem = async (req: AuthRequest, res: Response): Prom
       return;
     }
 
+    if (req.user?.role === 'PHARMACY') {
+      const pharmacy = await prisma.pharmacyProfile.findUnique({ where: { userId: req.user.id } });
+      if (!pharmacy || existing.pharmacyId !== pharmacy.id) {
+        res.status(403).json({ message: 'Action non autorisée sur cet article' });
+        return;
+      }
+    }
+
     const updated = await prisma.inventoryItem.update({
       where: { id },
       data: {
@@ -143,6 +168,14 @@ export const deleteInventoryItem = async (req: AuthRequest, res: Response): Prom
       return;
     }
 
+    if (req.user?.role === 'PHARMACY') {
+      const pharmacy = await prisma.pharmacyProfile.findUnique({ where: { userId: req.user.id } });
+      if (!pharmacy || existing.pharmacyId !== pharmacy.id) {
+        res.status(403).json({ message: 'Action non autorisée sur cet article' });
+        return;
+      }
+    }
+
     await prisma.inventoryItem.delete({ where: { id } });
     res.json({ message: 'Médicament supprimé avec succès' });
   } catch (error) {
@@ -160,6 +193,14 @@ export const updateStock = async (req: AuthRequest, res: Response): Promise<void
     if (!item) {
       res.status(404).json({ message: 'Médicament introuvable' });
       return;
+    }
+
+    if (req.user?.role === 'PHARMACY') {
+      const pharmacy = await prisma.pharmacyProfile.findUnique({ where: { userId: req.user.id } });
+      if (!pharmacy || item.pharmacyId !== pharmacy.id) {
+        res.status(403).json({ message: 'Action non autorisée sur cet article' });
+        return;
+      }
     }
 
     let newStock = item.stock;

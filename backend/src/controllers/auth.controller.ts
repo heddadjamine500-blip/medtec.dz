@@ -46,8 +46,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user with corresponding profile
+    const ALLOWED_PUBLIC_ROLES = ['PATIENT', 'DOCTOR', 'PHARMACY'];
     const userRole = (role || 'PATIENT').toUpperCase();
+
+    if (!ALLOWED_PUBLIC_ROLES.includes(userRole)) {
+      res.status(403).json({ message: "Ce rôle ne peut pas être créé via l'inscription publique." });
+      return;
+    }
 
     const user = await prisma.user.create({
       data: {
