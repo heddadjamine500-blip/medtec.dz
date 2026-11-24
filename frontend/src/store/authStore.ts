@@ -67,10 +67,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ token: res.token, user: res.user, isLoading: false });
       return res.user;
     } catch (err: any) {
-      const msg = err.response?.data?.message 
-        || (err.code === 'ERR_NETWORK' || !err.response 
-          ? 'Serveur inaccessible : assurez-vous que le backend tourne sur le port 10000.' 
-          : 'Identifiants incorrects');
+      let msg = err.response?.data?.message;
+      if (!msg) {
+        if (err.code === 'ERR_NETWORK' || !err.response) {
+          msg = 'Serveur backend inaccessible (port 10000). En local, lancez le backend Express sur le port 10000.';
+        } else if (err.response?.status === 401) {
+          msg = 'Email ou mot de passe incorrect (mot de passe démo : password123)';
+        } else {
+          msg = `Erreur serveur (${err.response?.status || 'connexion impossible'}).`;
+        }
+      }
       set({ error: msg, isLoading: false });
       throw new Error(msg);
     }

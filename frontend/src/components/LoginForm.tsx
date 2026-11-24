@@ -67,11 +67,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const [clientError, setClientError] = useState<string | null>(null);
   const [showForgotModal, setShowForgotModal] = useState(false);
 
-  const handleFillDemo = (demoEmail: string) => {
+  const handleFillDemo = (demoEmail: string, autoSubmit = false) => {
     setEmail(demoEmail);
     setPassword('password123');
     setClientError(null);
     onClearError();
+    if (autoSubmit) {
+      onSubmit(demoEmail, 'password123', rememberMe);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,24 +100,30 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       {/* Demo fast-login badges */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
             Comptes de démonstration
           </span>
-          <span className="text-[10px] text-gray-400">Cliquez pour pré-remplir</span>
+          <span className="text-[10px] text-gray-500 font-medium">
+            Mot de passe : <span className="text-[#2585D8] font-mono font-bold">password123</span>
+          </span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {DEMO_PRESETS.map((p) => (
             <button
               key={p.role}
               type="button"
-              onClick={() => handleFillDemo(p.email)}
-              className="flex items-center justify-center gap-1.5 py-1.5 px-2 bg-gray-50 hover:bg-gray-100/90 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-all cursor-pointer hover:border-gray-300 active:scale-95"
+              onClick={() => handleFillDemo(p.email, true)}
+              title={`Connexion instantanée en tant que ${p.label}`}
+              className="flex items-center justify-center gap-1.5 py-2 px-2 bg-gray-50 hover:bg-blue-50/80 border border-gray-200 hover:border-[#2585D8]/40 rounded-xl text-xs font-semibold text-gray-700 transition-all cursor-pointer active:scale-95 group"
             >
               <span style={{ color: p.color }}>{p.icon}</span>
-              <span>{p.label}</span>
+              <span className="group-hover:text-[#2585D8] transition-colors">{p.label}</span>
             </button>
           ))}
         </div>
+        <p className="text-[10px] text-gray-400 mt-1.5 text-center">
+          ⚡ Cliquez sur un profil ci-dessus pour vous connecter instantanément
+        </p>
       </div>
 
       <div className="h-px bg-gray-100" />
