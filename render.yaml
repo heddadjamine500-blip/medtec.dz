@@ -1,4 +1,4 @@
-# Render deployment configuration for MEDTEC Backend
+# Render deployment configuration for MEDTEC Backend (100% Free Tier compatible)
 # https://render.com/docs/yaml-spec
 
 services:
@@ -8,33 +8,22 @@ services:
     plan: free
     rootDir: backend
 
-    # Build steps: install → generate Prisma client → compile TypeScript
+    # Build steps: install dependencies -> generate Prisma client -> compile TypeScript
     buildCommand: npm install && npx prisma generate && npm run build
 
-    # Production start command – runs the compiled JS
+    # Production start command
     startCommand: npm run start
 
-    # Render will set PORT automatically; server listens on 0.0.0.0
+    # Health check endpoint
     healthCheckPath: /api/health
-
-    # Persistent disk for SQLite database (10 GB free on Render)
-    disk:
-      name: medtec-sqlite-disk
-      mountPath: /data
-      sizeGB: 1
 
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        generateValue: false
         value: "10000"
-      # DATABASE_PATH points to the persistent disk mount
-      - key: DATABASE_PATH
-        value: /data/dev.db
-      # Set these secrets in the Render dashboard (do NOT commit real values):
       - key: JWT_SECRET
-        sync: false   # marks as a secret – set manually in Render dashboard
+        generateValue: true
       - key: CLIENT_URL
         value: https://heddadjamine500-blip.github.io
       - key: CORS_ORIGIN
