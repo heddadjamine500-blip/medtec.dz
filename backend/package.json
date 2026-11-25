@@ -1,11 +1,17 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "MEDTEC Medical Platform – Express API Backend",
+  "main": "dist/src/server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
-    "dev": "nodemon src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx tsx watch src/server.ts",
+    "build": "npx tsc",
+    "start": "node startup.js",
+    "postinstall": "npx prisma generate",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +43,7 @@
     "prisma": "^7.7.0",
     "supertest": "^7.3.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
     "typescript": "^6.0.2",
     "vitest": "^5.1.1"
   }

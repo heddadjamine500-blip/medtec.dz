@@ -4,6 +4,11 @@ on:
   push:
     branches: ['main', 'master']
   workflow_dispatch:
+    inputs:
+      backend_url:
+        description: 'Production backend URL (e.g. https://medtec-backend.onrender.com)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -38,6 +43,10 @@ jobs:
         run: npm run build
         env:
           GITHUB_ACTIONS: true
+          # VITE_API_URL is set via GitHub Actions secret VITE_API_URL
+          # Set it in: Repository Settings → Secrets and variables → Actions → Variables
+          # Value example: https://medtec-backend.onrender.com
+          VITE_API_URL: ${{ secrets.VITE_API_URL || vars.VITE_API_URL || 'https://medtec-backend.onrender.com' }}
 
       - name: Verify build output and create 404.html fallback
         run: |

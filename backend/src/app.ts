@@ -12,7 +12,44 @@ import attendanceRoutes from './routes/attendance.routes';
 
 const app = express();
 
-app.use(cors());
+// Production CORS Configuration
+const allowedOrigins = [
+  'https://heddadjamine500-blip.github.io',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+  'http://localhost:3000',
+];
+
+if (process.env.CLIENT_URL) {
+  allowedOrigins.push(process.env.CLIENT_URL.trim().replace(/\/$/, ''));
+}
+if (process.env.CORS_ORIGIN) {
+  process.env.CORS_ORIGIN.split(',').forEach((o) => allowedOrigins.push(o.trim().replace(/\/$/, '')));
+}
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or Postman)
+      if (!origin) return callback(null, true);
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.github.io') ||
+        origin.endsWith('.onrender.com');
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        // Fallback: allow to prevent breaking unexpected domains
+        callback(null, true);
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  })
+);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '50mb' }));
