@@ -7,10 +7,10 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "npx tsx watch src/server.ts",
-    "build": "npx prisma generate && npx tsc",
+    "dev": "tsx watch src/server.ts",
+    "build": "prisma generate && tsc",
     "start": "node startup.js",
-    "postinstall": "npx prisma generate",
+    "postinstall": "prisma generate",
     "test": "vitest run"
   },
   "keywords": [],

@@ -38,8 +38,8 @@ if (dbTarget) {
 
 // ── 2. Apply Prisma migrations (additive only, safe to run every deploy) ──
 try {
-  log('Running: npx prisma migrate deploy');
-  execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+  log('Running: prisma migrate deploy');
+  execSync('npx --no-install prisma migrate deploy', { stdio: 'inherit' });
   log('Migrations applied successfully.');
 } catch (err) {
   log(`Warning: prisma migrate deploy failed (${err.message}). Continuing…`);

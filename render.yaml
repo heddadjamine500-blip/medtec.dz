@@ -8,8 +8,8 @@ services:
     plan: free
     rootDir: backend
 
-    # Build steps: install dependencies -> generate Prisma client -> compile TypeScript
-    buildCommand: npm install && npx prisma generate && npm run build
+    # Build steps: install dependencies -> generate Prisma 7 client -> compile TypeScript
+    buildCommand: npm install && npm run build
 
     # Production start command
     startCommand: npm run start
