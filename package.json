@@ -7,8 +7,8 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "postinstall": "npm --prefix backend install",
-    "build": "npm --prefix backend install && npm --prefix backend run build",
+    "postinstall": "npm --prefix backend install --include=dev",
+    "build": "npm --prefix backend install --include=dev && npm --prefix backend run build",
     "start": "npm --prefix backend run start"
   }
 }
